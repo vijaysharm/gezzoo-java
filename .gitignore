@@ -1,0 +1,4 @@
+target
+.settings
+src/main/java/com/vijaysharma/gezzoo/Constants.java
+src/main/webapp/WEB-INF/gezzoo-v1.api
