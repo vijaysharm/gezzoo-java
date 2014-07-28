@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.google.common.collect.Lists;
+import com.vijaysharma.gezzoo.models.Action;
 import com.vijaysharma.gezzoo.models.Character;
 import com.vijaysharma.gezzoo.models.Player;
 
@@ -16,7 +17,12 @@ public class PlayerResponse {
 		response.character = character == null ? null : character.getId().toString(); 
 		response.board = Lists.newArrayList();
 		for ( Entry<Long, Boolean> entry : player.getBoard().entrySet() ) {
-			response.board.add(PlayerCharacterStateResponse.from(entry));
+			response.board.add(PlayerCharacterState.from(entry));
+		}
+		
+		response.actions = Lists.newArrayList();
+		for ( Action action : player.getActions() ) {
+			response.actions.add(ActionResponse.from(player.getUserId(), action));
 		}
 		
 		return response;
@@ -26,6 +32,10 @@ public class PlayerResponse {
 		PlayerResponse response = new PlayerResponse();
 		response._id = player.getUserId();
 		response.username = player.getProfile().getName();
+		response.actions = Lists.newArrayList();
+		for ( Action action : player.getActions() ) {
+			response.actions.add(ActionResponse.from(player.getUserId(), action));
+		}
 		
 		return response;
 	}
@@ -33,8 +43,8 @@ public class PlayerResponse {
 	private String _id;
 	private String username;
 	private String character;
-	private List<PlayerCharacterStateResponse> board;
-	// TODO: Actions
+	private List<PlayerCharacterState> board;
+	private List<ActionResponse> actions;
 	
 	public String get_id() {
 		return _id;
@@ -44,12 +54,16 @@ public class PlayerResponse {
 		return username;
 	}
 	
-	public List<PlayerCharacterStateResponse> getBoard() {
+	public List<PlayerCharacterState> getBoard() {
 		return board;
 	}
 	
 	public String getCharacter() {
 		return character;
+	}
+	
+	public List<ActionResponse> getActions() {
+		return actions;
 	}
 	
 	@Override

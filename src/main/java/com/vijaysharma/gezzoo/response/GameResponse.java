@@ -20,6 +20,7 @@ public class GameResponse {
 		
 		response.me = PlayerResponse.me(me);
 		response.opponent = PlayerResponse.opponent(opponent);
+		response.winner = WinnerResponse.from(game.getWinner());
 		
 		return response;
 	}
@@ -33,7 +34,8 @@ public class GameResponse {
 	private BoardResponse board;
 	private PlayerResponse opponent;
 	private PlayerResponse me;
-
+	private WinnerResponse winner;
+	
 	public String get_id() {
 		return _id;
 	}
@@ -48,6 +50,10 @@ public class GameResponse {
 	
 	public String getTurn() {
 		return turn;
+	}
+	
+	public WinnerResponse getWinner() {
+		return winner;
 	}
 	
 	public boolean getEnded() {

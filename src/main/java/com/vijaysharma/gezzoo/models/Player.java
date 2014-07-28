@@ -1,8 +1,11 @@
 package com.vijaysharma.gezzoo.models;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -28,7 +31,7 @@ public class Player {
 	@Stringify(LongStringifier.class) 
 	private Map<Long, Boolean> board = new HashMap<Long, Boolean>();
 	
-	// TODO: Actions
+	private List<Action> actions = Lists.newArrayList();
 	
 	private Player() {}
 	
@@ -55,11 +58,20 @@ public class Player {
 		this.character = Ref.create(character);
 	}
 	
+	public List<Action> getActions() {
+		return ImmutableList.copyOf(actions);
+	}
+	
+	public void addAction(Action action) {
+		actions.add(action);
+	}
+	
 	@Override
 	public String toString() {
 		return "Player [id=" + id + ", userId=" + userId + ", board=" + board
 				+ ", getProfile()=" + getProfile() + ", getBoard()="
-				+ getBoard() + ", getCharacter() " + getCharacter() + "]";
+				+ getBoard() + ", getCharacter() " + getCharacter() 
+				+ ", actions=" + actions + "]";
 	}
 
 	public static class PlayerBuilder {

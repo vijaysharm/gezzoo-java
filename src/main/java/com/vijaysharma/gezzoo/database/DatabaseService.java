@@ -48,7 +48,7 @@ public class DatabaseService {
 		service.delete().type(clazz).ids(ids).now();	
 	}
 	
-	public <T> T transaction(final Action<T> action) {
+	public <T> T transaction(final Transaction<T> action) {
 		return service.transact(new Work<T>() {
 			@Override
 			public T run() {

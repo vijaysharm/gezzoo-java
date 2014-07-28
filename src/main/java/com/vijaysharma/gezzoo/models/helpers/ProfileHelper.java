@@ -3,7 +3,7 @@ package com.vijaysharma.gezzoo.models.helpers;
 import java.util.List;
 
 import com.google.common.collect.Sets;
-import com.vijaysharma.gezzoo.database.Action;
+import com.vijaysharma.gezzoo.database.Transaction;
 import com.vijaysharma.gezzoo.database.DatabaseService;
 import com.vijaysharma.gezzoo.database.QueryBuilder;
 import com.vijaysharma.gezzoo.models.Counters;
@@ -28,7 +28,7 @@ public class ProfileHelper {
 	}
 
 	public Profile createUserProfile() {
-		Long countId = service.transaction(new Action<Long>() {
+		Long countId = service.transaction(new Transaction<Long>() {
 			@Override
 			public Long go() {
 				Counters counters = service.load(Counters.class, Counters.COUNTERS_ID);

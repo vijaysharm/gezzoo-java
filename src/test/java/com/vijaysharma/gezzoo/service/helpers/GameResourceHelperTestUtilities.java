@@ -1,52 +1,41 @@
 package com.vijaysharma.gezzoo.service.helpers;
 
+import static com.vijaysharma.gezzoo.service.ObjectifyService.ofy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+import com.googlecode.objectify.Key;
+import com.vijaysharma.gezzoo.models.Action;
 import com.vijaysharma.gezzoo.models.Board;
 import com.vijaysharma.gezzoo.models.Character;
 import com.vijaysharma.gezzoo.models.Game;
+import com.vijaysharma.gezzoo.models.Guess;
 import com.vijaysharma.gezzoo.models.Player;
 import com.vijaysharma.gezzoo.models.Profile;
+import com.vijaysharma.gezzoo.models.Question;
+import com.vijaysharma.gezzoo.models.Winner;
+import com.vijaysharma.gezzoo.response.ActionResponse;
 import com.vijaysharma.gezzoo.response.GameResponse;
+import com.vijaysharma.gezzoo.response.PlayerCharacterState;
 
 public class GameResourceHelperTestUtilities {
 	public static void checkGame(Board expectedBoard, 
 								 Profile expectedUser,
 							     Profile expectedOpponent, 
 							     Game game) { 
-//		assertNotNull(game.getId());
-//		assertNotNull(game.getBoard());
-//		assertEquals(expectedBoard.getId(), game.getBoard().getId());
-//		assertEquals(1, game.getBoard().getCharacters().size());
-//		assertEquals(expectedBoard.getCharacters().get(0).getName(), game.getBoard().getCharacters().get(0).getName());
-//		assertEquals(expectedBoard.getCharacters().get(0).getImage(), game.getBoard().getCharacters().get(0).getImage());
-//		assertEquals(expectedBoard.getCharacters().get(0).getId(), game.getBoard().getCharacters().get(0).getId());
-//		assertEquals(false, game.isEnded());
-//		assertNotNull(game.getTurn());
-//		assertNotNull(expectedUser.getId(), game.getTurn().getId());
-//		assertNotNull(expectedUser.getName(), game.getTurn().getName());
-//		assertEquals(2, game.getPlayers().size());
-//		assertEquals(expectedUser.getId(), game.getPlayers().get(0).getUserId());
-//		assertEquals(expectedUser.getId(), game.getPlayers().get(0).getProfile().getId());
-//		assertEquals(expectedUser.getName(), game.getPlayers().get(0).getProfile().getName());
-//		assertNull(game.getPlayers().get(0).getCharacter());
-//		assertEquals(1, game.getPlayers().get(0).getBoard().size());
-//		assertEquals(true, game.getPlayers().get(0).getBoard().get(expectedBoard.getCharacters().get(0).getId()));
-//		assertEquals(expectedOpponent.getId(), game.getPlayers().get(1).getUserId());
-//		assertEquals(expectedOpponent.getId(), game.getPlayers().get(1).getProfile().getId());
-//		assertEquals(expectedOpponent.getName(), game.getPlayers().get(1) .getProfile().getName());
-//		assertNull(game.getPlayers().get(1).getCharacter());
-//		assertEquals(1, game.getPlayers().get(1).getBoard().size());
-//		assertEquals(true, game.getPlayers().get(1).getBoard().get(expectedBoard.getCharacters().get(0).getId()));
-		
+		List<PlayerCharacterState> playerBoard = Lists.newArrayList(
+			PlayerCharacterState.from(expectedBoard.getCharacters().get(0).getId(), true)
+		);		
 		GameAssertionBuilder.check(game)
 			.board(expectedBoard)
 			.ended(false)
 			.turn(expectedUser)
-			.player(expectedBoard, expectedUser, null)
-			.player(expectedBoard, expectedOpponent, null);
+			.player(playerBoard, expectedUser, null)
+			.player(playerBoard, expectedOpponent, null);
 	}
 
 	public static class GameAssertionBuilder {
@@ -72,9 +61,27 @@ public class GameResourceHelperTestUtilities {
 			return this;
 		}
 		
-		public GameAssertionBuilder ended(boolean ended) {
+		public GameAssertionBuilder ended(boolean ended, Winner winner) {
 			assertEquals(ended, game.isEnded());
+			if ( winner == null ) {
+				assertNull(game.getWinner());
+			} else {
+				assertEquals(
+					winner.getGuess().getCharacter().getId(), 
+					game.getWinner().getGuess().getCharacter().getId()
+				);
+				
+				assertEquals(
+					winner.getPlayer().getUserId(), 
+					game.getWinner().getPlayer().getUserId()
+				);
+			}
+				
 			return this;
+		}
+		
+		public GameAssertionBuilder ended(boolean ended) {
+			return this.ended(ended, null);
 		}
 		
 		public GameAssertionBuilder turn(Profile turn) {
@@ -84,17 +91,53 @@ public class GameResourceHelperTestUtilities {
 			return this;
 		}
 		
-		public GameAssertionBuilder player(Board board, Profile profile, Character character) {
+		public GameAssertionBuilder player(
+			List<PlayerCharacterState> board,
+			Profile profile, 
+			Character character,
+			Action...actions
+		) {
 			Player player = findPlayerInGame(game, profile);
 			Long actualCharacterId = player.getCharacter() == null ? null : player.getCharacter().getId();
 			Long characterId = character == null ? null : character.getId();
+			List<Action> acts = player.getActions();
 			
 			assertEquals(profile.getId(), player.getUserId());
 			assertEquals(profile.getId(), player.getProfile().getId());
 			assertEquals(profile.getName(), player.getProfile().getName());
 			assertEquals(characterId, actualCharacterId);
-			assertEquals(1, player.getBoard().size());
-			assertEquals(true, player.getBoard().get(board.getCharacters().get(0).getId()));
+			
+			assertEquals(board.size(), player.getBoard().size());
+			for ( int index = 0; index < board.size(); index++ ) {
+				PlayerCharacterState expectedState = board.get(index);
+				assertEquals(true, player.getBoard().containsKey(expectedState.getId()));
+				assertEquals(expectedState.getUp(), player.getBoard().get(expectedState.getId()));
+			}
+			
+			if ( actions == null ) {
+				assertEquals(0, acts.size());
+				return this;
+			}
+			
+			assertEquals(actions.length, acts.size());
+			for ( int index = 0; index < actions.length; index++ ) {
+				Action expectedAction = actions[index];
+				Action actualAction = acts.get(index);
+				
+				assertEquals(expectedAction.getClass(), actualAction.getClass());
+				if ( Question.class.equals(expectedAction.getClass()) ) {
+					Question expected = (Question) expectedAction;
+					Question actual = (Question) actualAction;
+					assertEquals(expected.getQuestion(), actual.getQuestion());
+					assertEquals(expected.getReply(), actual.getReply());
+				} else if ( Guess.class.equals(expectedAction.getClass()) ) {
+					Guess expected = (Guess) expectedAction;
+					Guess actual = (Guess) actualAction;
+					assertEquals(expected.getCharacter().getId(), actual.getCharacter().getId());
+					assertEquals(expected.getCharacter().getImage(), actual.getCharacter().getImage());
+					assertEquals(expected.getCharacter().getName(), actual.getCharacter().getName());
+				}
+			}
 			
 			return this;
 		}
@@ -114,27 +157,15 @@ public class GameResourceHelperTestUtilities {
 									 Profile expectedOpponent,
 									 Profile expectedTurn,
 									 GameResponse response) {
-//		assertNotNull(response);
-//		assertNotNull(response.get_id());
-//		assertEquals(false, response.getEnded());
-//		assertEquals(expectedTurn.getId(), response.getTurn());
-//		assertEquals(expectedBoard.getName(), response.getBoard().getName());
-//		assertEquals(1, response.getBoard().getCharacters().size());
-//		assertEquals(expectedUser.getId(), response.getMe().get_id());
-//		assertEquals(expectedUser.getName(), response.getMe().getUsername());
-//		assertEquals(1, response.getMe().getBoard().size());
-//		assertEquals(true, response.getMe().getBoard().get(0).getUp());
-//		assertEquals(expectedBoard.getCharacters().get(0).getId().toString(), response.getMe().getBoard().get(0).get_id());
-//		assertNull(response.getMe().getCharacter());
-//		assertEquals(expectedOpponent.getId(), response.getOpponent().get_id());
-//		assertEquals(expectedOpponent.getName(), response.getOpponent() .getUsername());
-//		assertNull(response.getOpponent().getCharacter());
-//		assertNull(response.getOpponent().getBoard());
+		List<PlayerCharacterState> playerBoard = Lists.newArrayList(
+			PlayerCharacterState.from(expectedBoard.getCharacters().get(0).getId(), true)
+		);
+		
 		ResponseAssertionBuilder.check(response)
 			.ended(false)
 			.board(expectedBoard)
 			.turn(expectedTurn)
-			.me(expectedBoard, expectedUser, null)
+			.me(playerBoard, expectedUser, null)
 			.opponent(expectedOpponent);
 	}
 
@@ -152,7 +183,18 @@ public class GameResourceHelperTestUtilities {
 		}
 		
 		public ResponseAssertionBuilder ended(boolean expected) {
+			return this.ended(expected, null);
+		}
+		
+		public ResponseAssertionBuilder ended(boolean expected, Winner winner) {
 			assertEquals(expected, response.getEnded());
+			if ( winner == null ) {
+				assertNull(response.getWinner());
+			} else {
+				assertNotNull(response.getWinner().getActionid());
+				assertEquals(winner.getPlayer().getUserId(), response.getWinner().getBy());
+			}
+			
 			return this;
 		}
 		
@@ -167,27 +209,64 @@ public class GameResourceHelperTestUtilities {
 			return this;
 		}
 		
-		public ResponseAssertionBuilder me(Board board, Profile me, Character character) {
+		public ResponseAssertionBuilder me(List<PlayerCharacterState> board, Profile me, Character character, Action...actions) {
 			String characterId = character == null ? null : character.getId().toString();
 			
-			assertEquals(board.getCharacters().get(0).getId().toString(), response.getMe().getBoard().get(0).get_id());
-			assertEquals(board.getCharacters().get(0).getId().toString(), response.getMe().getBoard().get(0).get_id());
-			assertEquals(true, response.getMe().getBoard().get(0).getUp());
+			assertEquals(board.size(), response.getMe().getBoard().size());
+			for ( int index = 0; index < board.size(); index++ ) {
+				PlayerCharacterState expectedState = board.get(index);
+				PlayerCharacterState actualState = response.getMe().getBoard().get(index);
+
+				assertEquals(expectedState.getId(), actualState.getId());
+				assertEquals(expectedState.getUp(), actualState.getUp());
+			}
+			
 			assertEquals(me.getId(), response.getMe().get_id());
 			assertEquals(me.getName(), response.getMe().getUsername());
 			assertEquals(me.getName(), response.getMe().getUsername());
 			assertEquals(characterId, response.getMe().getCharacter());
+			checkActions(me, actions, response.getMe().getActions());
 			
 			return this;
 		}
 		
-		public ResponseAssertionBuilder opponent(Profile opponent) {
+		public ResponseAssertionBuilder opponent(Profile opponent, Action...actions) {
 			assertEquals(opponent.getId(), response.getOpponent().get_id());
 			assertEquals(opponent.getName(), response.getOpponent() .getUsername());
 			assertNull(response.getOpponent().getCharacter());
 			assertNull(response.getOpponent().getBoard());
+			checkActions(opponent, actions, response.getOpponent().getActions());
 			
 			return this;
+		}
+		
+		private void checkActions(Profile user, Action[] actions, List<ActionResponse> response) {
+			if ( actions == null ) {
+				assertEquals(0, response.size());
+				return;
+			}
+			
+			assertEquals(actions.length, response.size());
+			for ( int index = 0; index < actions.length; index++ ) {
+				Action expectedAction = actions[index];
+				ActionResponse actualAction = response.get(index);
+
+				assertEquals(user.getId(), actualAction.getBy());
+				assertNotNull(actualAction.get_id());
+				if ( Question.class.equals(expectedAction.getClass())) {
+					Question question = (Question) expectedAction;
+					assertEquals(question.getQuestion(), actualAction.getValue());
+					assertEquals("question", actualAction.getAction());
+					if ( question.getReply() == null )
+						assertNull(actualAction.getReply());
+					else
+						assertEquals(question.getReply(), actualAction.getReply().getValue());
+				} else if ( Guess.class.equals(expectedAction.getClass())) {
+					Guess guess = (Guess) expectedAction;
+					assertEquals("guess", actualAction.getAction());
+					assertEquals(guess.getCharacter().getId().toString(), actualAction.getValue());
+				}
+			}
 		}
 	}
 	
@@ -200,7 +279,7 @@ public class GameResourceHelperTestUtilities {
 		
 		throw new IllegalArgumentException("No players match opponents");
 	}
-
+	
 	public static Profile findOpponent(Profile user, Game game, Profile... opponents) {
 		for (Player player : game.getPlayers()) {
 			if (player.getUserId().equals(user.getId())) {
@@ -215,5 +294,9 @@ public class GameResourceHelperTestUtilities {
 		}
 
 		throw new IllegalArgumentException("No players match opponents");
+	}
+	
+	public static Game loadGameFromResponse(GameResponse response) {
+		return ofy().load().key(Key.create(Game.class, Long.parseLong(response.get_id()))).now();
 	}
 }

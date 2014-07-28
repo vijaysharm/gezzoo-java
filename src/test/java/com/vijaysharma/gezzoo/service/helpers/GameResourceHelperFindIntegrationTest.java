@@ -25,6 +25,7 @@ import com.vijaysharma.gezzoo.models.helpers.BoardHelper;
 import com.vijaysharma.gezzoo.models.helpers.GameHelper;
 import com.vijaysharma.gezzoo.models.helpers.ProfileHelper;
 import com.vijaysharma.gezzoo.response.GameResponse;
+import com.vijaysharma.gezzoo.utilities.IdFactory;
 
 public class GameResourceHelperFindIntegrationTest {
 	private GameResourceHelper gameResourceHelper;
@@ -44,7 +45,7 @@ public class GameResourceHelperFindIntegrationTest {
 		profileHelper = new ProfileHelper(db());
 		boardHelper = new BoardHelper(db());
 		GameHelper gameHelper = new GameHelper(new BoardHelper(db()), db());
-		gameResourceHelper = new GameResourceHelper(gameHelper, profileHelper);
+		gameResourceHelper = new GameResourceHelper(gameHelper, profileHelper, IdFactory.DEFAULT);
 		
 		board = new Board(10L);
 		board.setName("test board name");

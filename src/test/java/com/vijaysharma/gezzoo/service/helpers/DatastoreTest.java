@@ -6,18 +6,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
+import com.googlecode.objectify.annotation.Subclass;
 
 public class DatastoreTest {
     private final LocalServiceTestHelper helper =
@@ -50,7 +54,6 @@ public class DatastoreTest {
 	
 	public static class B {
 		private String b_property;
-		private B() {};
 		public B(String b) { b_property = b; }
 	}
 	
@@ -62,7 +65,7 @@ public class DatastoreTest {
 		@Index private String a_property; 
 	}
 	
-	@Test
+	@Ignore
 	public void test() {
 		factory().register(A.class);
 //		factory().register(B.class);
@@ -110,5 +113,92 @@ public class DatastoreTest {
 		
 		assertEquals("ds_data", ac.d.get().d_data);
 		assertNotNull(ac);
+	}
+	
+	@Entity
+	public class Animal {
+	    @Id Long id;
+	    String name;
+	}
+	        
+	@Subclass(index=true)
+	public class Mammal extends Animal {
+	    boolean longHair;
+	}
+	        
+	@Subclass
+	public class Cat extends Mammal {
+	    boolean hypoallergenic;
+	}
+
+	@Entity
+	public static class Base {
+		private @Id String id;
+		private String base_data = "base-data";
+		
+		private Base() {};
+		Base(String id){ this.id = id; }
+	}
+
+	@Subclass
+	public static class Extended extends Base {
+		private String ex_data = "extended-data";
+		private Extended(){};
+		private Extended(String id){ super(id); }
+	}
+	
+	@Entity
+	public static class TestClass {
+		@Id Long id;
+		List<Base> items = new ArrayList<DatastoreTest.Base>();
+	}
+	
+	@Test
+	public void test_inheritance() {
+		factory().register(Animal.class);
+		factory().register(Mammal.class);
+		factory().register(Cat.class);
+		
+		Animal annie = new Animal();
+		annie.name = "Annie";
+		ofy().save().entity(annie).now();
+
+		Mammal mam = new Mammal();
+		mam.name = "Mam";
+		mam.longHair = true;
+		ofy().save().entity(mam).now();
+
+		Cat nyan = new Cat();
+		nyan.name = "Nyan";
+		nyan.longHair = true;
+		nyan.hypoallergenic = true;
+		ofy().save().entity(nyan).now();
+
+		// This will return the Cat
+		Animal fetched = ofy().load().type(Animal.class).id(nyan.id).now();
+		assertEquals(Cat.class, fetched.getClass());
+		
+		// This query will produce three objects, the Animal, Mammal, and Cat
+		List<Animal> all = ofy().load().type(Animal.class).list();
+		assertEquals(3, all.size());
+		
+		// This query will produce the Mammal and Cat
+		List<Mammal> mammals = ofy().load().type(Mammal.class).list();
+		assertEquals(2, mammals.size());
+		
+		assertEquals(Animal.class, all.get(0).getClass());
+		assertEquals(Mammal.class, all.get(1).getClass());
+		assertEquals(Cat.class, all.get(2).getClass());
+		
+		factory().register(TestClass.class);
+		factory().register(Extended.class);
+		
+		TestClass obj = new TestClass();
+		obj.items.add(new Base("dsfkdjsfds"));
+		obj.items.add(new Extended("dhgewvfrrfds"));
+		Key<TestClass> key = ofy().save().entity(obj).now();
+		
+		TestClass now = ofy().load().key(key).now();
+		assertEquals(2, now.items.size());
 	}
 }

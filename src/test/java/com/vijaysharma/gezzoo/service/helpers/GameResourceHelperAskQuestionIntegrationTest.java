@@ -3,7 +3,6 @@ package com.vijaysharma.gezzoo.service.helpers;
 import static com.vijaysharma.gezzoo.database.DatabaseService.db;
 import static com.vijaysharma.gezzoo.service.ObjectifyService.ofy;
 import static com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.findOpponent;
-import static com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.findPlayer;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -13,6 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
@@ -21,8 +21,8 @@ import com.googlecode.objectify.Key;
 import com.vijaysharma.gezzoo.models.Board;
 import com.vijaysharma.gezzoo.models.Character;
 import com.vijaysharma.gezzoo.models.Game;
-import com.vijaysharma.gezzoo.models.Player;
 import com.vijaysharma.gezzoo.models.Profile;
+import com.vijaysharma.gezzoo.models.Question;
 import com.vijaysharma.gezzoo.models.helpers.BoardHelper;
 import com.vijaysharma.gezzoo.models.helpers.GameHelper;
 import com.vijaysharma.gezzoo.models.helpers.ProfileHelper;
@@ -32,7 +32,7 @@ import com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.Ga
 import com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.ResponseAssertionBuilder;
 import com.vijaysharma.gezzoo.utilities.IdFactory;
 
-public class GameResourceHelperSetCharacterIntegrationTest {
+public class GameResourceHelperAskQuestionIntegrationTest {
 	private GameResourceHelper gameResourceHelper;
 	private ProfileHelper profileHelper;
 	private BoardHelper boardHelper;
@@ -44,7 +44,7 @@ public class GameResourceHelperSetCharacterIntegrationTest {
 	private GameResponse response1;
 	private GameResponse response2;
 	private List<PlayerCharacterState> playerBoard;
-	
+    
 	@Before
 	public void before() throws Exception {
 		helper.setUp();
@@ -96,88 +96,140 @@ public class GameResourceHelperSetCharacterIntegrationTest {
 	}
 
 	@Test(expected=UnauthorizedException.class)
-	public void setCharacter_throws_if_its_not_the_users_turn() throws Exception {
-		Profile opponent = response1.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
-		gameResourceHelper.setCharacter(opponent.getId(), response1.get_id(), board.getCharacters().get(0).getId().toString());
+	public void setQuestion_throws_when_game_ended() throws Exception {
+		Game game = loadGameFromResponse(response1);
+		game.setEnded(true);
+		ofy().save().entity(game).now();
+		
+		gameResourceHelper.setQuestion(
+			user1.getId(), 
+			response1.get_id(), 
+			"Dumb question",
+			playerBoard
+		);
 	}
 	
-	@Test(expected=NumberFormatException.class)
-	public void setCharacter_throws_if_character_id_is_not_long() throws Exception {
-		Profile opponent = response1.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
-		gameResourceHelper.setCharacter(opponent.getId(), response1.get_id(), "blah");
+	@Test(expected=BadRequestException.class)
+	public void setQuestion_throws_if_player_board_doesnt_match_expected_board() throws Exception {
+		playerBoard = Lists.newArrayList(
+			PlayerCharacterState.from(new Long("-1"), true)
+		);
+		
+		gameResourceHelper.setQuestion(
+			user1.getId(), 
+			response1.get_id(), 
+			"Dumb question",
+			playerBoard
+		);
 	}
 	
 	@Test(expected=UnauthorizedException.class)
-	public void setCharacter_throws_if_character_js_already_set() throws Exception {
-		Game game = loadGameFromResponse(response1);
-		Character character = ofy().load().key(Key.create(Character.class, board.getCharacters().get(0).getId())).now();
-		Player player = findPlayer(user1, game);
-		player.setCharacter(character);
+	public void setQuestion_throws_if_its_not_the_users_turn() throws Exception {
+		Profile opponent = response1.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
+		gameResourceHelper.setQuestion(
+			opponent.getId(), 
+			response1.get_id(), 
+			"Dumb question",
+			playerBoard
+		);
+	}
+	
+	@Test(expected=UnauthorizedException.class)
+	public void setQuestion_throws_when_player_has_no_character_set() throws Exception {
+		gameResourceHelper.setQuestion(
+			user1.getId(), 
+			response1.get_id(), 
+			"Dumb question",
+			playerBoard
+		);
+	}
+	
+	@Test(expected=UnauthorizedException.class)
+	public void setQuestion_throws_when_opponent_has_no_character_set() throws Exception {
+		GameResponse response = gameResourceHelper.setCharacter(
+			user1.getId(), 
+			response1.get_id(), 
+			board.getCharacters().get(0).getId().toString()
+		);
+		
+		Game game = loadGameFromResponse(response);
+		game.setTurn(user1);
 		ofy().save().entity(game).now();
+		
+		gameResourceHelper.setQuestion(
+			user1.getId(), 
+			response1.get_id(), 
+			"Dumb question",
+			playerBoard
+		);
+	}
+	
+	@Test(expected=BadRequestException.class)
+	public void setQuestion_throws_question_is_empty() throws Exception {
+		Profile opponent = response1.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
+		gameResourceHelper.setCharacter(
+			user1.getId(), 
+			response1.get_id(), 
+			board.getCharacters().get(0).getId().toString()
+		);
+		
+		gameResourceHelper.setCharacter(
+			opponent.getId(), 
+			response1.get_id(), 
+			board.getCharacters().get(0).getId().toString()
+		);
+		
+		gameResourceHelper.setQuestion(
+			opponent.getId(), 
+			response1.get_id(), 
+			"",
+			playerBoard
+		);
+	}
+	
+	@Test
+	public void setQuestion_saves_action_and_updated_board_then_returns_successful_response() throws Exception {
+		Character character = ofy().load().key(Key.create(Character.class, board.getCharacters().get(0).getId())).now();
+		Profile opponent = response1.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
+		List<PlayerCharacterState> updatedBoard = Lists.newArrayList(
+			PlayerCharacterState.from(board.getCharacters().get(0).getId(), false)
+		);
 		
 		gameResourceHelper.setCharacter(
 			user1.getId(), 
 			response1.get_id(), 
 			board.getCharacters().get(0).getId().toString()
 		);
-	}
-	
-	@Test
-	public void setCharacter_saves_selection_updates_turn_when_opponent_has_no_character() throws Exception {
-		Character character = ofy().load().key(Key.create(Character.class, board.getCharacters().get(0).getId())).now();
 		
-		Profile opponent = response1.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
-		GameResponse response = gameResourceHelper.setCharacter(
-			user1.getId(), 
+		gameResourceHelper.setCharacter(
+			opponent.getId(), 
 			response1.get_id(), 
 			board.getCharacters().get(0).getId().toString()
 		);
-
+		
+		GameResponse response = gameResourceHelper.setQuestion(
+			opponent.getId(), 
+			response1.get_id(), 
+			"How are ya?",
+			updatedBoard
+		);
+		
+		Question question = new Question(null, "How are ya?");
+		
 		ResponseAssertionBuilder.check(response)
-			.board(board)
 			.ended(false)
-			.turn(opponent)
-			.me(playerBoard, user1, character)
-			.opponent(opponent);
+			.board(board)
+			.turn(user1)
+			.me(updatedBoard, opponent, character, question)
+			.opponent(user1);
 		
 		Game game = loadGameFromResponse(response);
 		GameAssertionBuilder.check(game)
 			.board(board)
 			.ended(false)
-			.turn(opponent)
-			.player(playerBoard, user1, character)
-			.player(playerBoard, opponent, null);
-	}
-
-	@Test
-	public void setCharacter_saves_selection_but_doesnt_update_turn_when_opponent_has_character() throws Exception {
-		Profile opponent = response1.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
-		Character character = ofy().load().key(Key.create(Character.class, board.getCharacters().get(0).getId())).now();
-		Game game = loadGameFromResponse(response1);
-		Player player = findPlayer(opponent, game);
-		player.setCharacter(character);
-		ofy().save().entity(game).now();
-		
-		GameResponse response = gameResourceHelper.setCharacter(
-			user1.getId(), 
-			response1.get_id(), 
-			board.getCharacters().get(0).getId().toString()
-		);
-
-		ResponseAssertionBuilder.check(response)
-			.board(board)
-			.ended(false)
-			.turn(user1)
-			.me(playerBoard, user1, character)
-			.opponent(opponent);
-		
-		game = loadGameFromResponse(response);
-		GameAssertionBuilder.check(game)
-			.board(board)
-			.ended(false)
 			.turn(user1)
 			.player(playerBoard, user1, character)
-			.player(playerBoard, opponent, character);
+			.player(updatedBoard, opponent, character, question);
 	}
 	
 	private static Game loadGameFromResponse(GameResponse response) {
@@ -187,7 +239,7 @@ public class GameResourceHelperSetCharacterIntegrationTest {
 	public static void checkGame(Board expectedBoard, 
 								 Profile expectedUser,
 								 List<PlayerCharacterState> userBoard,
-							     Profile expectedOpponent, 
+							     Profile expectedOpponent,
 							     List<PlayerCharacterState> opponentBoard,
 							     Game game) {
 		GameAssertionBuilder.check(game)
@@ -199,7 +251,7 @@ public class GameResourceHelperSetCharacterIntegrationTest {
 	}
 	
 	public static void checkResponse(Board expectedBoard,
-									 Profile expectedUser, 
+									 Profile expectedUser,
 									 List<PlayerCharacterState> playerBoard,
 									 Profile expectedOpponent,
 									 Profile expectedTurn,

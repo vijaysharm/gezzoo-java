@@ -23,7 +23,7 @@ public class Game {
 	@Index private List<Player> players = Lists.newArrayList();
 	@Index private boolean ended;
 	private Date modified;
-//	private Winner winner
+	private Winner winner;
 	
 	public Long getId() {
 		return id;
@@ -41,6 +41,14 @@ public class Game {
 		return ImmutableList.copyOf(players);
 	}
 	
+	public Winner getWinner() {
+		return winner;
+	}
+	
+	public void setWinner(Winner winner) {
+		this.winner = winner;
+	}
+
 //	public Map<String, Player> getPlayerMap() {
 //		return Maps.uniqueIndex(players, new Function<Player, String>() {
 //			@Override
@@ -49,6 +57,10 @@ public class Game {
 //			}
 //		});
 //	}
+	
+	public void setEnded(boolean ended) {
+		this.ended = ended;
+	}
 	
 	public boolean isEnded() {
 		return ended;

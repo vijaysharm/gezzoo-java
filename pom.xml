@@ -15,7 +15,7 @@
         <mockito.version>1.9.5</mockito.version>
         <guava.version>17.0</guava.version>
         <rxjava.version>0.19.6</rxjava.version>
-        <objectify.version>5.0</objectify.version>
+        <objectify.version>5.0.3</objectify.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
