@@ -69,6 +69,10 @@ public class Game {
 	public void setTurn(Profile turn) {
 		this.turn = Ref.create(turn);
 	}
+
+	public Date getModified() {
+		return modified;
+	}
 	
 	@OnSave
 	void onSave() {

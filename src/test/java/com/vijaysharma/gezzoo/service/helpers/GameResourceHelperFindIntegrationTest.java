@@ -3,7 +3,6 @@ package com.vijaysharma.gezzoo.service.helpers;
 import static com.vijaysharma.gezzoo.database.DatabaseService.db;
 import static com.vijaysharma.gezzoo.service.ObjectifyService.ofy;
 import static com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.checkGame;
-import static com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.checkResponse;
 import static com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.findOpponent;
 import static org.junit.Assert.assertEquals;
 
@@ -25,6 +24,9 @@ import com.vijaysharma.gezzoo.models.helpers.BoardHelper;
 import com.vijaysharma.gezzoo.models.helpers.GameHelper;
 import com.vijaysharma.gezzoo.models.helpers.ProfileHelper;
 import com.vijaysharma.gezzoo.response.GameResponse;
+import com.vijaysharma.gezzoo.response.GameResponse.GameState;
+import com.vijaysharma.gezzoo.response.PlayerCharacterState;
+import com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.ResponseAssertionBuilder;
 import com.vijaysharma.gezzoo.utilities.IdFactory;
 
 public class GameResourceHelperFindIntegrationTest {
@@ -38,6 +40,7 @@ public class GameResourceHelperFindIntegrationTest {
 	private Board board;
 	private GameResponse response1;
 	private GameResponse response2;
+	private List<PlayerCharacterState> playerBoard;
     
 	@Before
 	public void before() throws Exception {
@@ -57,13 +60,29 @@ public class GameResourceHelperFindIntegrationTest {
 		List<Profile> profiles = ofy().load().type(Profile.class).list();
 		assertEquals(3, profiles.size());
 		
+		playerBoard = Lists.newArrayList(
+			PlayerCharacterState.from(board.getCharacters().get(0).getId(), true)
+		);
+		
 		response1 = gameResourceHelper.create(user1.getId());
 		Profile opponent = response1.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
-		checkResponse(board, user1, opponent, user1, response1);
+		ResponseAssertionBuilder.check(response1)
+			.state(GameState.USER_CHARACTER_SELECT)
+			.ended(false)
+			.board(board)
+			.turn(user1)
+			.me(playerBoard, user1, null)
+			.opponent(opponent);
 		
 		response2 = gameResourceHelper.create(user1.getId());
 		opponent = response2.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
-		checkResponse(board, user1, opponent, user1, response2);
+		ResponseAssertionBuilder.check(response2)
+			.state(GameState.USER_CHARACTER_SELECT)
+			.ended(false)
+			.board(board)
+			.turn(user1)
+			.me(playerBoard, user1, null)
+			.opponent(opponent);
 		
 		// Sanity Check: Test the contents of the DB
 		List<Game> games = ofy().load().type(Game.class).list();
@@ -92,11 +111,27 @@ public class GameResourceHelperFindIntegrationTest {
 
 		GameResponse response = gameResponses.get(0);
 		Profile opponent = response.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
-		checkResponse(board, user1, opponent, user1, response);
+		List<PlayerCharacterState> playerBoard = Lists.newArrayList(
+			PlayerCharacterState.from(board.getCharacters().get(0).getId(), true)
+		);
 		
+		ResponseAssertionBuilder.check(response)
+			.state(GameState.USER_CHARACTER_SELECT)
+			.ended(false)
+			.board(board)
+			.turn(user1)
+			.me(playerBoard, user1, null)
+			.opponent(opponent);
+			
 		response = gameResponses.get(1);
 		opponent = response.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
-		checkResponse(board, user1, opponent, user1, response);
+		ResponseAssertionBuilder.check(response)
+			.state(GameState.USER_CHARACTER_SELECT)
+			.ended(false)
+			.board(board)
+			.turn(user1)
+			.me(playerBoard, user1, null)
+			.opponent(opponent);
 	}
 
 	@Test
@@ -104,10 +139,23 @@ public class GameResourceHelperFindIntegrationTest {
 		// Test the actual query method
 		GameResponse response = gameResourceHelper.findOne(user1.getId(), response1.get_id());
 		Profile opponent = response.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
-		checkResponse(board, user1, opponent, user1, response);
+		
+		ResponseAssertionBuilder.check(response)
+			.state(GameState.USER_CHARACTER_SELECT)
+			.ended(false)
+			.board(board)
+			.turn(user1)
+			.me(playerBoard, user1, null)
+			.opponent(opponent);
 		
 		response = gameResourceHelper.findOne(user1.getId(), response2.get_id());
 		opponent = response.getOpponent().get_id().equals(user2.getId()) ? user2 : user3;
-		checkResponse(board, user1, opponent, user1, response);
+		ResponseAssertionBuilder.check(response)
+			.state(GameState.USER_CHARACTER_SELECT)
+			.ended(false)
+			.board(board)
+			.turn(user1)
+			.me(playerBoard, user1, null)
+			.opponent(opponent);
 	}
 }

@@ -30,6 +30,7 @@ import com.vijaysharma.gezzoo.models.helpers.BoardHelper;
 import com.vijaysharma.gezzoo.models.helpers.GameHelper;
 import com.vijaysharma.gezzoo.models.helpers.ProfileHelper;
 import com.vijaysharma.gezzoo.response.GameResponse;
+import com.vijaysharma.gezzoo.response.GameResponse.GameState;
 import com.vijaysharma.gezzoo.response.PlayerCharacterState;
 import com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.GameAssertionBuilder;
 import com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.ResponseAssertionBuilder;
@@ -80,6 +81,7 @@ public class GameResourceHelperGuessIntegrationTest {
 		
 		gameResponse = gameResourceHelper.create(user.getId());
 		ResponseAssertionBuilder.check(gameResponse)
+			.state(GameState.USER_CHARACTER_SELECT)
 			.ended(false)
 			.board(board)
 			.turn(user)
@@ -122,6 +124,7 @@ public class GameResourceHelperGuessIntegrationTest {
 		question = new Question(null, QUESTION_TEXT);
 		
 		ResponseAssertionBuilder.check(gameResponse)
+			.state(GameState.READ_ONLY)
 			.ended(false)
 			.board(board)
 			.turn(user)
@@ -150,6 +153,7 @@ public class GameResourceHelperGuessIntegrationTest {
 		expected.setReply(REPLY_TEXT);
 		
 		ResponseAssertionBuilder.check(gameResponse)
+			.state(GameState.READ_ONLY)
 			.ended(false)
 			.board(board)
 			.turn(opponent)
@@ -208,6 +212,7 @@ public class GameResourceHelperGuessIntegrationTest {
 		Guess guess = new Guess(null, guessed);
 		
 		ResponseAssertionBuilder.check(response)
+			.state(GameState.READ_ONLY)
 			.ended(false)
 			.board(board)
 			.turn(user)
@@ -241,6 +246,7 @@ public class GameResourceHelperGuessIntegrationTest {
 		Winner winner = new Winner(findPlayer(opponent, loadGameFromResponse(gameResponse)), guess);
 		
 		ResponseAssertionBuilder.check(response)
+			.state(GameState.READ_ONLY)
 			.ended(true, winner)
 			.board(board)
 			.turn(user)

@@ -24,4 +24,9 @@ public class WinnerResponse {
 	public String getActionid() {
 		return actionId;
 	}
+
+	@Override
+	public String toString() {
+		return "WinnerResponse [by=" + by + ", actionId=" + actionId + "]";
+	}
 }

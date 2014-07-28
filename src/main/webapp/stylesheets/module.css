@@ -1,0 +1,338 @@
+.block {
+	display: table;
+	width: 100%;
+	height: 100%;
+
+	overflow: hidden;
+}
+
+.splash-title {
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;
+
+	position: relative;
+	top: 0%;
+	left: 0%;
+}
+
+@-webkit-keyframes slideright {
+	0% {
+		left: -100%;
+	}
+	100% {
+		left: 0%;
+	}
+}
+
+.slide {
+	-webkit-animation: slideright 5s;
+}
+
+.overlay {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+  	top: 0;
+  	left: 0;
+
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 2;
+	text-align: center;
+}
+
+.new-game-item {
+	font-size: 2em;
+	padding: 24px 0;
+	background-color: tomato;
+	cursor: pointer;
+	opacity: 1;
+
+	transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	-webkit-transition: all 0.3s;	
+}
+
+.new-game-item:hover {
+	opacity: 0.9;
+}
+
+.new-game-item:active {
+	opacity: 0.7;
+}
+
+.character-game-item {
+	text-align: center;
+	padding: 4px;
+}
+
+.character-game-item > div {
+	position: relative;
+}
+
+.character-game-item img {
+	width: 100%;
+	height: auto;
+}
+
+.character-game-item .info {
+	color: white;
+	background-color: rgba(0,0,0,0.5);
+	padding: 4px;
+}
+
+.character-game-item .flipped,
+.character-game-item .overlay {
+	background-color: white;
+	opacity: 0.0;
+
+	padding-top: 50%;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 1;
+
+	transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	-webkit-transition: all 0.3s;
+}
+
+.character-game-item .flipped {
+	opacity: 0.7;
+}
+
+.character-game-item .overlay:hover {
+	cursor: pointer;
+	opacity: 0.5;
+}
+
+.character-game-item .overlay:active {
+	color: white;
+	background-color: black;
+	opacity: 0.5;
+}
+
+.character-game-item .controls {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	z-index: 2;
+}
+
+.character-game-item .control {
+	color: white;
+	background-color: rgba(0,0,0,0.5);
+	padding: 16px 0px;
+	display: none;
+	cursor: pointer;
+}
+
+.character-game-item .show-control {
+	display: block;
+}
+
+.character-game-item .control:hover {
+	opacity: 0.7;
+}
+
+.character-game-item .control:active {
+	opacity: 0.8;
+}
+
+.view-controls {
+	text-align: center;
+}
+
+.view-controls li {
+	padding: 24px 0;
+	background-color: white;
+	opacity: 1.0;
+	cursor: pointer;
+
+	transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	-webkit-transition: all 0.3s;	
+}
+
+.view-controls li:hover {
+	opacity: 0.5;
+}
+
+.view-controls li:active {
+	opacity: 0.3;
+}
+
+.spacer li {
+	height: 10px;
+	background-color: white;
+}
+
+.spacer li.active {
+	background-color: red;	
+}
+
+.my-comment {
+	text-align: right;
+}
+
+.comment {
+	background-color: white;
+}
+
+.comment .info {
+	padding: 8px;
+}
+
+.comments {
+	padding: 8px 0;
+}
+
+.comment-wrapper {
+	padding: 1px 0;	
+}
+
+.comment .my-character,
+.comment .guess {
+	text-align: center;
+}
+
+.comment .my-character img,
+.comment .guess img {
+	height: auto;
+	width: 100%;
+}
+
+.comment .my-character {
+	padding: 0 25%;
+}
+
+.input {
+	padding: 8px;	
+}
+
+.input input[type="text"], .input input[type="submit"] {
+	padding: 24px;
+	font-size: 20px;
+}
+
+.input input[type="submit"] {
+	cursor: pointer;
+	transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	-webkit-transition: all 0.3s;	
+}
+
+.input input[type="submit"]:hover, .input input[type="submit"]:active {
+	background-color: #CCC;
+	font-size: 22px;
+	padding: 23px;
+}
+
+.empty {
+	background-color: white;
+	padding: 20px 0;
+}
+
+#test-users-select {
+	font-size: 20px;
+}
+
+.dialog {
+	color: white;
+	background-color: black;
+	margin: 0px auto;
+	width: 90%;
+	position: relative;
+	top: 30%;
+	padding: 16px;
+}
+
+.dialog h2 {
+	padding: 12px 0;
+}
+
+.dialog p {
+	padding: 12px 4px;
+	line-height: 1.6em;
+}
+
+.title {
+	text-align: center;
+	text-transform: uppercase;
+	display: block;
+	padding: 8px;
+	font-weight: bold;
+}
+
+.confirm {
+	height: 48px;
+	background-color: rgba(256, 256, 256, 1.0);
+	color: black;
+	padding: 8px 16px;
+
+	transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	-webkit-transition: all 0.3s;
+}
+
+.confirm:hover {
+	background-color: rgba(256, 256, 256, 0.9);
+}
+
+.confirm:active {
+	background-color: rgba(256, 256, 256, 0.5);
+}
+
+.replay {
+	padding: 16px;
+	background-color: rgba(256, 256, 256, 1.0);
+	color: black;
+
+	transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	-webkit-transition: all 0.3s;
+	cursor: pointer;
+}
+
+.replay:hover {
+	background-color: rgba(256, 256, 200, 1.0);
+	color: black;
+}
+
+.replay:active {
+	background-color: rgba(0, 0, 0, 1.0);
+	color: white;
+}
+
+.navika {
+	text-align: center;
+}
+
+.navika h1 {
+	padding: 8px;
+}
+
+.navika p {
+	padding: 16px;
+}
+
+.navika .go {
+	transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	-webkit-transition: all 0.3s;
+	cursor: pointer;
+	padding: 8px;
+	background-color: tomato;
+	color: white;
+	opacity: 1.0;
+}
+
+.navika .go:hover {
+	opacity: 0.7;
+}
+
+.navika .go:active {
+	opacity: 0.6;
+}

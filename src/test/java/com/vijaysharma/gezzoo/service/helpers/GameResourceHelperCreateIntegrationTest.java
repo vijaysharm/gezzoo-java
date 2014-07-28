@@ -3,7 +3,6 @@ package com.vijaysharma.gezzoo.service.helpers;
 import static com.vijaysharma.gezzoo.database.DatabaseService.db;
 import static com.vijaysharma.gezzoo.service.ObjectifyService.ofy;
 import static com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.checkGame;
-import static com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.checkResponse;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -17,6 +16,7 @@ import com.google.api.server.spi.response.NotFoundException;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.common.collect.Lists;
 import com.vijaysharma.gezzoo.models.Board;
 import com.vijaysharma.gezzoo.models.Character;
 import com.vijaysharma.gezzoo.models.Game;
@@ -25,6 +25,9 @@ import com.vijaysharma.gezzoo.models.helpers.BoardHelper;
 import com.vijaysharma.gezzoo.models.helpers.GameHelper;
 import com.vijaysharma.gezzoo.models.helpers.ProfileHelper;
 import com.vijaysharma.gezzoo.response.GameResponse;
+import com.vijaysharma.gezzoo.response.GameResponse.GameState;
+import com.vijaysharma.gezzoo.response.PlayerCharacterState;
+import com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.ResponseAssertionBuilder;
 import com.vijaysharma.gezzoo.utilities.IdFactory;
 
 public class GameResourceHelperCreateIntegrationTest {
@@ -68,13 +71,23 @@ public class GameResourceHelperCreateIntegrationTest {
 		board.setCharacters(Arrays.asList(Character.newCharacter("character name", "character category", "character img")));
 		boardHelper.create(board);
 		
+		List<PlayerCharacterState> playerBoard = Lists.newArrayList(
+			PlayerCharacterState.from(board.getCharacters().get(0).getId(), true)
+		);
+		
 		Profile opponent = profileHelper.createUserProfile();
 		Profile user = profileHelper.createUserProfile();
 		GameResponse response = gameResourceHelper.create(user.getId());
 		List<Game> games = ofy().load().type(Game.class).list();
 		
 		assertEquals(1, games.size());
-		checkResponse(board, user, opponent, user, response);
+		ResponseAssertionBuilder.check(response)
+			.state(GameState.USER_CHARACTER_SELECT)
+			.ended(false)
+			.board(board)
+			.turn(user)
+			.me(playerBoard, user, null)
+			.opponent(opponent);
 		checkGame(board, user, opponent, games.get(0));
 	}
 
@@ -87,18 +100,35 @@ public class GameResourceHelperCreateIntegrationTest {
 		Profile opponent = profileHelper.createUserProfile();
 		Profile user = profileHelper.createUserProfile();
 		
+		List<PlayerCharacterState> playerBoard = Lists.newArrayList(
+			PlayerCharacterState.from(board.getCharacters().get(0).getId(), true)
+		);
+	
 		GameResponse response = gameResourceHelper.create(user.getId());
 		List<Game> games = ofy().load().type(Game.class).list();
 		
 		assertEquals(1, games.size());
-		checkResponse(board, user, opponent, user, response);
+		ResponseAssertionBuilder.check(response)
+			.state(GameState.USER_CHARACTER_SELECT)
+			.ended(false)
+			.board(board)
+			.turn(user)
+			.me(playerBoard, user, null)
+			.opponent(opponent);
 		checkGame(board, user, opponent, games.get(0));
 		
 		response = gameResourceHelper.create(user.getId(), opponent.getId());
 		games = ofy().load().type(Game.class).list();
 		
 		assertEquals(1, games.size());
-		checkResponse(board, user, opponent, user, response);
+		ResponseAssertionBuilder.check(response)
+			.state(GameState.USER_CHARACTER_SELECT)
+			.ended(false)
+			.board(board)
+			.turn(user)
+			.me(playerBoard, user, null)
+			.opponent(opponent);
+		
 		checkGame(board, user, opponent, games.get(0));
 		
 		// paranoia. Checking if nothing else was deleted

@@ -216,6 +216,7 @@ public class GameResourceHelper {
 		game.setEnded(ended);
 		current.addAction(guess);
 		updateTurn(game, opponent);
+		updatePlayerBoard(current, playerBoard);
 		if ( ended ) game.setWinner(new Winner(current, guess)); 
 		
 		gameHelper.saveGame(game);
@@ -223,6 +224,30 @@ public class GameResourceHelper {
 		return GameResponse.from(user, game);
 	}
 
+	public GameResponse saveBoard(
+		String userId, 
+		String gameId, 
+		List<PlayerCharacterState> playerBoard
+	) throws UnauthorizedException, NotFoundException, BadRequestException {
+		Profile user = fetchProfile(userId);
+		Game game = fetchGame(user, gameId);
+		
+		checkGame(game);
+		checkBoard(game.getBoard(), playerBoard);
+		
+		Player current = findPlayerInGame(game, user);
+		Player opponent = findOpponentInGame(game, user);
+
+		checkCharacterSet(current);
+		checkCharacterSet(opponent);
+		
+		updatePlayerBoard(current, playerBoard);
+		
+		gameHelper.saveGame(game);
+		
+		return GameResponse.from(user, game);
+	}
+	
 	private void checkGame(Game game) throws UnauthorizedException {
 		if ( game.isEnded() )
 			throw new UnauthorizedException("Game [" + game.getId() + "] has ended. It can't be modified.");

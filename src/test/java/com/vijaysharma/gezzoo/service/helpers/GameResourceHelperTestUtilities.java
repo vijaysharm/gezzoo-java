@@ -20,6 +20,7 @@ import com.vijaysharma.gezzoo.models.Question;
 import com.vijaysharma.gezzoo.models.Winner;
 import com.vijaysharma.gezzoo.response.ActionResponse;
 import com.vijaysharma.gezzoo.response.GameResponse;
+import com.vijaysharma.gezzoo.response.GameResponse.GameState;
 import com.vijaysharma.gezzoo.response.PlayerCharacterState;
 
 public class GameResourceHelperTestUtilities {
@@ -151,23 +152,6 @@ public class GameResourceHelperTestUtilities {
 			throw new IllegalArgumentException();
 		}
 	}
-	
-	public static void checkResponse(Board expectedBoard,
-									 Profile expectedUser, 
-									 Profile expectedOpponent,
-									 Profile expectedTurn,
-									 GameResponse response) {
-		List<PlayerCharacterState> playerBoard = Lists.newArrayList(
-			PlayerCharacterState.from(expectedBoard.getCharacters().get(0).getId(), true)
-		);
-		
-		ResponseAssertionBuilder.check(response)
-			.ended(false)
-			.board(expectedBoard)
-			.turn(expectedTurn)
-			.me(playerBoard, expectedUser, null)
-			.opponent(expectedOpponent);
-	}
 
 	public static class ResponseAssertionBuilder {
 		private final GameResponse response;
@@ -237,6 +221,11 @@ public class GameResourceHelperTestUtilities {
 			assertNull(response.getOpponent().getBoard());
 			checkActions(opponent, actions, response.getOpponent().getActions());
 			
+			return this;
+		}
+
+		public ResponseAssertionBuilder state(GameState state) {
+			assertEquals(state, response.getGameState());
 			return this;
 		}
 		

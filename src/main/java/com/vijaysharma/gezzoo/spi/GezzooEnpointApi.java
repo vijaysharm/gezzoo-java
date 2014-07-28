@@ -16,10 +16,13 @@ import com.vijaysharma.gezzoo.Constants;
 import com.vijaysharma.gezzoo.models.helpers.BoardHelper;
 import com.vijaysharma.gezzoo.models.helpers.GameHelper;
 import com.vijaysharma.gezzoo.models.helpers.ProfileHelper;
+import com.vijaysharma.gezzoo.response.BoardResponse;
 import com.vijaysharma.gezzoo.response.GameResponse;
 import com.vijaysharma.gezzoo.response.ProfileResponse;
+import com.vijaysharma.gezzoo.service.helpers.BoardResourceHelper;
 import com.vijaysharma.gezzoo.service.helpers.GameResourceHelper;
 import com.vijaysharma.gezzoo.service.helpers.ProfileResourceHelper;
+import com.vijaysharma.gezzoo.utilities.Data;
 import com.vijaysharma.gezzoo.utilities.IdFactory;
 
 @Api(
@@ -39,10 +42,10 @@ import com.vijaysharma.gezzoo.utilities.IdFactory;
     description = "Gezzoo Api"
 )
 public class GezzooEnpointApi {
-//	@ApiMethod(name = "createBoard", path = "board", httpMethod = HttpMethod.POST)
-//	public BoardResponse createBoard() {
-//		return new BoardResourceHelper(new BoardHelper(db())).create(Data.createBoard());
-//	}
+	@ApiMethod(name = "createBoard", path = "board", httpMethod = HttpMethod.POST)
+	public BoardResponse createBoard() {
+		return new BoardResourceHelper(new BoardHelper(db())).create(Data.createBoard());
+	}
 	
 	@ApiMethod(
 		name = "createProfile", 
@@ -111,6 +114,19 @@ public class GezzooEnpointApi {
 		return createGameHelper().setCharacter(id, gameId, characterId);
 	}
 	
+	@ApiMethod(
+		name = "saveBoard", 
+		path = "games/{gameId}/board", 
+		httpMethod = HttpMethod.POST
+	)
+	public GameResponse saveBoard(
+		@Named("id") String id, 
+		@Named("gameId") String gameId, 
+		BoardForm player_board
+	) throws UnauthorizedException, NotFoundException, BadRequestException {
+		return createGameHelper().saveBoard(id, gameId, player_board.getPlayerBoard());
+	}
+
 	@ApiMethod(
 		name = "askQuestion", 
 		path = "games/{gameId}/question", 

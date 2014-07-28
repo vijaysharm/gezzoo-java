@@ -27,6 +27,7 @@ import com.vijaysharma.gezzoo.models.helpers.BoardHelper;
 import com.vijaysharma.gezzoo.models.helpers.GameHelper;
 import com.vijaysharma.gezzoo.models.helpers.ProfileHelper;
 import com.vijaysharma.gezzoo.response.GameResponse;
+import com.vijaysharma.gezzoo.response.GameResponse.GameState;
 import com.vijaysharma.gezzoo.response.PlayerCharacterState;
 import com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.GameAssertionBuilder;
 import com.vijaysharma.gezzoo.service.helpers.GameResourceHelperTestUtilities.ResponseAssertionBuilder;
@@ -134,6 +135,7 @@ public class GameResourceHelperSetCharacterIntegrationTest {
 		);
 
 		ResponseAssertionBuilder.check(response)
+			.state(GameState.READ_ONLY)
 			.board(board)
 			.ended(false)
 			.turn(opponent)
@@ -165,6 +167,7 @@ public class GameResourceHelperSetCharacterIntegrationTest {
 		);
 
 		ResponseAssertionBuilder.check(response)
+			.state(GameState.USER_ACTION)
 			.board(board)
 			.ended(false)
 			.turn(user1)
@@ -205,6 +208,7 @@ public class GameResourceHelperSetCharacterIntegrationTest {
 									 Profile expectedTurn,
 									 GameResponse response) {
 		ResponseAssertionBuilder.check(response)
+			.state(GameState.USER_CHARACTER_SELECT)
 			.ended(false)
 			.board(expectedBoard)
 			.turn(expectedTurn)
