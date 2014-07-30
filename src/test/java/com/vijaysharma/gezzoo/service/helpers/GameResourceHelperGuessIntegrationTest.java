@@ -153,10 +153,10 @@ public class GameResourceHelperGuessIntegrationTest {
 		expected.setReply(REPLY_TEXT);
 		
 		ResponseAssertionBuilder.check(gameResponse)
-			.state(GameState.READ_ONLY)
+			.state(GameState.USER_ACTION)
 			.ended(false)
 			.board(board)
-			.turn(opponent)
+			.turn(user)
 			.me(playerBoard, user, character)
 			.opponent(opponent, expected);
 		
@@ -164,7 +164,7 @@ public class GameResourceHelperGuessIntegrationTest {
 		GameAssertionBuilder.check(game)
 			.board(board)
 			.ended(false)
-			.turn(opponent)
+			.turn(user)
 			.player(playerBoard, user, character)
 			.player(playerBoard, opponent, character, expected);		
 	}
@@ -178,7 +178,7 @@ public class GameResourceHelperGuessIntegrationTest {
 	@Test(expected=NumberFormatException.class)
 	public void guess_throws_if_character_id_cannot_be_parsed() throws Exception {
 		gameResourceHelper.guess(
-			opponent.getId(),
+			user.getId(),
 			gameResponse.get_id(), 
 			"blah", 
 			playerBoard
@@ -188,7 +188,7 @@ public class GameResourceHelperGuessIntegrationTest {
 	@Test(expected=NotFoundException.class)
 	public void guess_throws_if_character_is_not_found_on_board() throws Exception {
 		gameResourceHelper.guess(
-			opponent.getId(),
+			user.getId(),
 			gameResponse.get_id(), 
 			"-1", 
 			playerBoard
@@ -200,7 +200,7 @@ public class GameResourceHelperGuessIntegrationTest {
 		Character guessed = board.getCharacters().get(1);
 		
 		GameResponse response = gameResourceHelper.guess(
-			opponent.getId(),
+			user.getId(),
 			gameResponse.get_id(), 
 			guessed.getId().toString(), 
 			playerBoard
@@ -215,17 +215,17 @@ public class GameResourceHelperGuessIntegrationTest {
 			.state(GameState.READ_ONLY)
 			.ended(false)
 			.board(board)
-			.turn(user)
-			.me(playerBoard, opponent, character, expected, guess)
-			.opponent(user);
+			.turn(opponent)
+			.me(playerBoard, user, character, guess)
+			.opponent(opponent, expected);
 
 		Game game = loadGameFromResponse(response);
 		GameAssertionBuilder.check(game)
 			.board(board)
 			.ended(false)
-			.turn(user)
-			.player(playerBoard, user, character)
-			.player(playerBoard, opponent, character, expected, guess);				
+			.turn(opponent)
+			.player(playerBoard, user, character, guess)
+			.player(playerBoard, opponent, character, expected);		
 	}
 	
 	@Test
@@ -233,7 +233,7 @@ public class GameResourceHelperGuessIntegrationTest {
 		Character guessed = board.getCharacters().get(0);
 		
 		GameResponse response = gameResourceHelper.guess(
-			opponent.getId(),
+			user.getId(),
 			gameResponse.get_id(), 
 			guessed.getId().toString(), 
 			playerBoard
@@ -243,22 +243,22 @@ public class GameResourceHelperGuessIntegrationTest {
 		expected.setReply(REPLY_TEXT);
 		
 		Guess guess = new Guess(null, guessed);
-		Winner winner = new Winner(findPlayer(opponent, loadGameFromResponse(gameResponse)), guess);
+		Winner winner = new Winner(findPlayer(user, loadGameFromResponse(gameResponse)), guess);
 		
 		ResponseAssertionBuilder.check(response)
 			.state(GameState.READ_ONLY)
 			.ended(true, winner)
 			.board(board)
-			.turn(user)
-			.me(playerBoard, opponent, character, expected, guess)
-			.opponent(user);
+			.turn(opponent)
+			.me(playerBoard, user, character, guess)
+			.opponent(opponent, expected);
 
 		Game game = loadGameFromResponse(response);
 		GameAssertionBuilder.check(game)
 			.board(board)
 			.ended(true, winner)
-			.turn(user)
-			.player(playerBoard, user, character)
-			.player(playerBoard, opponent, character, expected, guess);				
+			.turn(opponent)
+			.player(playerBoard, user, character, guess)
+			.player(playerBoard, opponent, character, expected);				
 	}	
 }

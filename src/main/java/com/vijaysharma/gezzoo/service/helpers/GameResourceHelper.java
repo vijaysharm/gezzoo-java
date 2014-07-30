@@ -182,7 +182,6 @@ public class GameResourceHelper {
 			throw new BadRequestException("Reply already given to [" + questionId + "]");
 		
 		question.setReply(reply);
-		updateTurn(game, opponent);
 		
 		gameHelper.saveGame(game);
 		

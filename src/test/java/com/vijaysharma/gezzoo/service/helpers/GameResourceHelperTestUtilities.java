@@ -218,7 +218,7 @@ public class GameResourceHelperTestUtilities {
 			assertEquals(opponent.getId(), response.getOpponent().get_id());
 			assertEquals(opponent.getName(), response.getOpponent() .getUsername());
 			assertNull(response.getOpponent().getCharacter());
-			assertNull(response.getOpponent().getBoard());
+			assertEquals(0, response.getOpponent().getBoard().size());
 			checkActions(opponent, actions, response.getOpponent().getActions());
 			
 			return this;

@@ -24,7 +24,7 @@ public class Data {
 			Character.newCharacter("Abhishek Bachchan", "bollywood", "/images/bollywood/MV5BMTk1NjU1NjkxN15BMl5BanBnXkFtZTcwNDI4MDMzMg@@._V1_SY317_CR10,0,214,317_.jpg"),
 			Character.newCharacter("John Abraham", "bollywood", "/images/bollywood/MV5BMTY1MDUyMjI1N15BMl5BanBnXkFtZTYwMjg4MjA0._V1_SX214_CR0,0,214,317_.jpg"),
 			Character.newCharacter("Deepika Padukone", "bollywood", "/images/bollywood/MV5BMjAxMTAwMTY2MV5BMl5BanBnXkFtZTcwOTM5NTQyMg@@._V1_SX214_CR0,0,214,317_.jpg"),
-			Character.newCharacter("Katrina Kaif", "bollywood", "/images/bollywood/MV5BMTUwODY3NzA3NF5BMl5BanBnXkFtZTcwNTEzNDg3OA@@._V1_SY317_CR6,0,214,317_.jpg'}"),
+			Character.newCharacter("Katrina Kaif", "bollywood", "/images/bollywood/MV5BMTUwODY3NzA3NF5BMl5BanBnXkFtZTcwNTEzNDg3OA@@._V1_SY317_CR6,0,214,317_.jpg"),
 			Character.newCharacter("Anushka Sharma", "bollywood", "/images/bollywood/MV5BMTc0NDMzMDYyM15BMl5BanBnXkFtZTcwMDEwMTA1NA@@._V1_SY317_CR104,0,214,317_.jpg"),
 			Character.newCharacter("Priyanka Chopra", "bollywood", "/images/bollywood/MV5BMjAxNzUwNjExOV5BMl5BanBnXkFtZTcwNDUyMTUxNw@@._V1_SY317_CR105,0,214,317_.jpg"),
 			Character.newCharacter("Aishwarya Rai", "bollywood", "/images/bollywood/MV5BMjEyMjEyODkzN15BMl5BanBnXkFtZTcwODkxMTY1Mg@@._V1_SX214_CR0,0,214,317_.jpg"),
@@ -34,7 +34,7 @@ public class Data {
 			Character.newCharacter("Preity Zinta", "bollywood", "/images/bollywood/MV5BMTQyMDc4NTE1Ml5BMl5BanBnXkFtZTcwOTQwMDgxOA@@._V1_SX214_CR0,0,214,317_.jpg"),
 			Character.newCharacter("Kajol", "bollywood", "/images/bollywood/MV5BNzIyNDI1MTYwMV5BMl5BanBnXkFtZTcwNzg5MzcxMw@@._V1_SY317_CR131,0,214,317_.jpg"),
 			Character.newCharacter("Madhuri Dixit", "bollywood", "/images/bollywood/MV5BMjI1MTMxMDMxMV5BMl5BanBnXkFtZTcwMTUzNzY3Nw@@._V1_SY317_CR18,0,214,317_.jpg"),
-			Character.newCharacter("Juhi Chawla", "bollywood", "/images/bollywood/MV5BNzI1MzUxODczNV5BMl5BanBnXkFtZTcwNDUyNTA0MQ@@._V1_SY317_CR12,0,214,317_.jp")
+			Character.newCharacter("Juhi Chawla", "bollywood", "/images/bollywood/MV5BNzI1MzUxODczNV5BMl5BanBnXkFtZTcwNDUyNTA0MQ@@._V1_SY317_CR12,0,214,317_.jpg")
         ));
 		
 		return board;

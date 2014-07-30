@@ -16,13 +16,14 @@ import com.vijaysharma.gezzoo.Constants;
 import com.vijaysharma.gezzoo.models.helpers.BoardHelper;
 import com.vijaysharma.gezzoo.models.helpers.GameHelper;
 import com.vijaysharma.gezzoo.models.helpers.ProfileHelper;
-import com.vijaysharma.gezzoo.response.BoardResponse;
 import com.vijaysharma.gezzoo.response.GameResponse;
 import com.vijaysharma.gezzoo.response.ProfileResponse;
-import com.vijaysharma.gezzoo.service.helpers.BoardResourceHelper;
 import com.vijaysharma.gezzoo.service.helpers.GameResourceHelper;
 import com.vijaysharma.gezzoo.service.helpers.ProfileResourceHelper;
-import com.vijaysharma.gezzoo.utilities.Data;
+import com.vijaysharma.gezzoo.spi.forms.AskForm;
+import com.vijaysharma.gezzoo.spi.forms.GuessForm;
+import com.vijaysharma.gezzoo.spi.forms.ReplyForm;
+import com.vijaysharma.gezzoo.spi.forms.SaveForm;
 import com.vijaysharma.gezzoo.utilities.IdFactory;
 
 @Api(
@@ -42,10 +43,10 @@ import com.vijaysharma.gezzoo.utilities.IdFactory;
     description = "Gezzoo Api"
 )
 public class GezzooEnpointApi {
-	@ApiMethod(name = "createBoard", path = "board", httpMethod = HttpMethod.POST)
-	public BoardResponse createBoard() {
-		return new BoardResourceHelper(new BoardHelper(db())).create(Data.createBoard());
-	}
+//	@ApiMethod(name = "createBoard", path = "board", httpMethod = HttpMethod.POST)
+//	public BoardResponse createBoard() {
+//		return new BoardResourceHelper(new BoardHelper(db())).create(Data.createBoard());
+//	}
 	
 	@ApiMethod(
 		name = "createProfile", 
@@ -62,7 +63,7 @@ public class GezzooEnpointApi {
 		httpMethod = HttpMethod.POST
 	)
 	public ProfileResponse login(
-		@Named("id") String id
+		@Named("token") String id
 	) {
 		return createProfileHelper().login(id);
 	}
@@ -73,9 +74,21 @@ public class GezzooEnpointApi {
 		httpMethod = HttpMethod.POST
 	)
 	public GameResponse newGame(
-		@Named("id") String id
+		@Named("token") String id
 	) throws UnauthorizedException, NotFoundException {
 		return createGameHelper().create(id);
+	}
+
+	@ApiMethod(
+		name = "newGameWith", 
+		path = "gamesWith", 
+		httpMethod = HttpMethod.POST
+	)
+	public GameResponse newGameWith(
+		@Named("token") String userId,
+		@Named("opponent") String opponentId
+	) throws UnauthorizedException, NotFoundException {
+		return createGameHelper().create(userId, opponentId);
 	}
 
 	@ApiMethod(
@@ -84,7 +97,7 @@ public class GezzooEnpointApi {
 		httpMethod = HttpMethod.GET
 	)
 	public Collection<GameResponse> getGames(
-		@Named("id") String id
+		@Named("token") String id
 	) throws UnauthorizedException {
 		return createGameHelper().findAll(id);
 	}
@@ -95,7 +108,7 @@ public class GezzooEnpointApi {
 		httpMethod = HttpMethod.GET
 	)
 	public GameResponse getGame(
-		@Named("id") String id, 
+		@Named("token") String id, 
 		@Named("gameId") String gameId
 	) throws UnauthorizedException, NotFoundException, BadRequestException {
 		return createGameHelper().findOne(id, gameId);
@@ -107,7 +120,7 @@ public class GezzooEnpointApi {
 		httpMethod = HttpMethod.POST
 	)
 	public GameResponse setCharacter(
-		@Named("id") String id, 
+		@Named("token") String id, 
 		@Named("gameId") String gameId, 
 		@Named("character") String characterId
 	) throws UnauthorizedException, NotFoundException, BadRequestException {
@@ -120,11 +133,9 @@ public class GezzooEnpointApi {
 		httpMethod = HttpMethod.POST
 	)
 	public GameResponse saveBoard(
-		@Named("id") String id, 
-		@Named("gameId") String gameId, 
-		BoardForm player_board
+		SaveForm form
 	) throws UnauthorizedException, NotFoundException, BadRequestException {
-		return createGameHelper().saveBoard(id, gameId, player_board.getPlayerBoard());
+		return createGameHelper().saveBoard(form.getToken(), form.getGameId(), form.getBoard());
 	}
 
 	@ApiMethod(
@@ -133,12 +144,9 @@ public class GezzooEnpointApi {
 		httpMethod = HttpMethod.POST
 	)
 	public GameResponse askQuestion(
-		@Named("id") String id, 
-		@Named("gameId") String gameId, 
-		@Named("question") String question,
-		BoardForm player_board
+		AskForm form
 	) throws UnauthorizedException, NotFoundException, BadRequestException {
-		return createGameHelper().setQuestion(id, gameId, question, player_board.getPlayerBoard());
+		return createGameHelper().setQuestion(form.getToken(), form.getGameId(), form.getQuestion(), form.getBoard());
 	}
 	
 	@ApiMethod(
@@ -147,12 +155,9 @@ public class GezzooEnpointApi {
 		httpMethod = HttpMethod.POST
 	)
 	public GameResponse postReply(
-		@Named("id") String id, 
-		@Named("gameId") String gameId, 
-		@Named("questionId") String questionId,
-		@Named("reply") String reply
+		ReplyForm form
 	) throws UnauthorizedException, NotFoundException, BadRequestException {
-		return createGameHelper().postReply(id, gameId, questionId, reply);
+		return createGameHelper().postReply(form.getToken(), form.getGameId(), form.getQuestionId(), form.getReply());
 	}
 	
 	@ApiMethod(
@@ -161,12 +166,9 @@ public class GezzooEnpointApi {
 		httpMethod = HttpMethod.POST
 	)
 	public GameResponse guess(
-		@Named("id") String id, 
-		@Named("gameId") String gameId, 
-		@Named("character") String characterId,
-		BoardForm player_board
+		GuessForm form
 	) throws UnauthorizedException, NotFoundException, BadRequestException {
-		return createGameHelper().guess(id, gameId, characterId, player_board.getPlayerBoard());
+		return createGameHelper().guess(form.getToken(), form.getGameId(), form.getCharacterId(), form.getBoard());
 	}
 	
 	private ProfileResourceHelper createProfileHelper() {

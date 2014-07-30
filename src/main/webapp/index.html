@@ -372,19 +372,20 @@
 	<script src="/javascripts/handlebars-1.1.2.js"></script>
 	<script src="/javascripts/ember-1.3.1.js"></script>
 	<script src="/javascripts/ember-animated-outlet.js"></script>
-	    <script>
+	<script src="/javascripts/app.js"></script>	
+    <script>
         /**
          * Initializes the Google API JavaScript client. Bootstrap the angular module after loading the Google libraries
          * so that Google JavaScript library ready in the angular modules.
          */
         function init() {
-            gapi.client.load('gezzoo', 'v1', null, '//' + window.location.host + '/_ah/api');
-            gapi.client.load('oauth2', 'v2', function () {
-                // TODO: somehow bootstrap application only after API load
-            });
+            var root = '//' + window.location.host + '/_ah/api';
+            var callback = function() {
+            	Launcher.init();
+            };
+            gapi.client.load('gezzoo', 'v1', callback, root);
         };
     </script>
-    <script src="//apis.google.com/js/client:plusone.js?onload=init"></script>
-	<script src="/javascripts/app.js"></script>
+    <script src="https://apis.google.com/js/client.js?onload=init"></script>
 </body>
 </html>

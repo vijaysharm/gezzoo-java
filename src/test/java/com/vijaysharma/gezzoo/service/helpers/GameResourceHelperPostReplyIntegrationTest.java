@@ -192,10 +192,10 @@ public class GameResourceHelperPostReplyIntegrationTest {
 		expected.setReply(REPLY_TEXT);
 		
 		ResponseAssertionBuilder.check(response)
-			.state(GameState.READ_ONLY)
+			.state(GameState.USER_ACTION)
 			.ended(false)
 			.board(board)
-			.turn(opponent)
+			.turn(user)
 			.me(playerBoard, user, character)
 			.opponent(opponent, expected);
 		

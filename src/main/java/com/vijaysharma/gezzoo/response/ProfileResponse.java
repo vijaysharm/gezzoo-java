@@ -7,13 +7,19 @@ public class ProfileResponse {
 		ProfileResponse response = new ProfileResponse();
 		response.setName(profile.getName());
 		response.setToken(profile.getId());
+		response.id = profile.getId();
 		
 		return response;
 	}
 	
+	private String id;
 	private String name;
 	private String token;
 
+	public String getId() {
+		return id;
+	}
+	
 	public String getName() {
 		return name;
 	}

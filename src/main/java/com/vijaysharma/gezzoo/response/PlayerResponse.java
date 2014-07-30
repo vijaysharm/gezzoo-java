@@ -15,12 +15,10 @@ public class PlayerResponse {
 		response._id = player.getUserId();
 		response.username = player.getProfile().getName();
 		response.character = character == null ? null : character.getId().toString(); 
-		response.board = Lists.newArrayList();
 		for ( Entry<Long, Boolean> entry : player.getBoard().entrySet() ) {
 			response.board.add(PlayerCharacterState.from(entry));
 		}
 		
-		response.actions = Lists.newArrayList();
 		for ( Action action : player.getActions() ) {
 			response.actions.add(ActionResponse.from(player.getUserId(), action));
 		}
@@ -32,7 +30,6 @@ public class PlayerResponse {
 		PlayerResponse response = new PlayerResponse();
 		response._id = player.getUserId();
 		response.username = player.getProfile().getName();
-		response.actions = Lists.newArrayList();
 		for ( Action action : player.getActions() ) {
 			response.actions.add(ActionResponse.from(player.getUserId(), action));
 		}
@@ -43,8 +40,8 @@ public class PlayerResponse {
 	private String _id;
 	private String username;
 	private String character;
-	private List<PlayerCharacterState> board;
-	private List<ActionResponse> actions;
+	private List<PlayerCharacterState> board = Lists.newArrayList();
+	private List<ActionResponse> actions = Lists.newArrayList();
 	
 	public String get_id() {
 		return _id;

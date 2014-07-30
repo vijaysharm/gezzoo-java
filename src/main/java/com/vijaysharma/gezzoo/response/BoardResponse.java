@@ -3,6 +3,7 @@ package com.vijaysharma.gezzoo.response;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.vijaysharma.gezzoo.models.Board;
 import com.vijaysharma.gezzoo.models.Character;
 
@@ -20,7 +21,7 @@ public class BoardResponse {
 	}
 	
 	private String name;
-	private List<CharacterResponse> characters;
+	private List<CharacterResponse> characters = Lists.newArrayList();
 	
 	public String getName() {
 		return name;
@@ -35,7 +36,8 @@ public class BoardResponse {
 	}
 	
 	public void setCharacters(List<CharacterResponse> characters) {
-		this.characters = characters;
+		this.characters.clear();
+		this.characters.addAll(characters);
 	}
 
 	@Override
