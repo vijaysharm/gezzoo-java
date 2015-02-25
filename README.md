@@ -27,5 +27,5 @@ From root
 # mkdir target/generated-sources/appengine-endpoints
 # cp -R src/main/webapp/ target/generated-sources/appengine-endpoints/.
 # mvn clean appengine:devserver # for development
-# mvn -e appengine:update # for production
+# mvn clean appengine:update # for production
 ```
