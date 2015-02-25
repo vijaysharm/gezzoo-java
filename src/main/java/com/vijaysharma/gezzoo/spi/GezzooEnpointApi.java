@@ -43,10 +43,14 @@ import com.vijaysharma.gezzoo.utilities.IdFactory;
     description = "Gezzoo Api"
 )
 public class GezzooEnpointApi {
-//	@ApiMethod(name = "createBoard", path = "board", httpMethod = HttpMethod.POST)
-//	public BoardResponse createBoard() {
-//		return new BoardResourceHelper(new BoardHelper(db())).create(Data.createBoard());
-//	}
+	@ApiMethod(
+		name = "createBoard", 
+		path = "board", 
+		httpMethod = HttpMethod.POST
+	)
+	public BoardResponse createBoard() {
+		return new BoardResourceHelper(new BoardHelper(db())).create(Data.createBoard());
+	}
 	
 	@ApiMethod(
 		name = "createProfile", 
