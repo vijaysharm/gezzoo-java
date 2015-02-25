@@ -1,0 +1,523 @@
+{
+  "kind" : "discovery#restDescription",
+  "etag" : "\"c05bU6zpvXPOpQakG5gG3IOJh8Y/Q4zn3s-QZdhjZk6GXRU6Hs1Pr3o\"",
+  "discoveryVersion" : "v1",
+  "id" : "gezzoo:v1",
+  "name" : "gezzoo",
+  "version" : "v1",
+  "description" : "Gezzoo Api",
+  "icons" : {
+    "x16" : "http://www.google.com/images/icons/product/search-16.gif",
+    "x32" : "http://www.google.com/images/icons/product/search-32.gif"
+  },
+  "protocol" : "rest",
+  "baseUrl" : "https://gezzoo-game.appspot.com/_ah/api/gezzoo/v1/",
+  "basePath" : "/_ah/api/gezzoo/v1/",
+  "rootUrl" : "https://gezzoo-game.appspot.com/_ah/api/",
+  "servicePath" : "gezzoo/v1/",
+  "batchPath" : "batch",
+  "parameters" : {
+    "alt" : {
+      "type" : "string",
+      "description" : "Data format for the response.",
+      "default" : "json",
+      "enum" : [ "json" ],
+      "enumDescriptions" : [ "Responses with Content-Type of application/json" ],
+      "location" : "query"
+    },
+    "fields" : {
+      "type" : "string",
+      "description" : "Selector specifying which fields to include in a partial response.",
+      "location" : "query"
+    },
+    "key" : {
+      "type" : "string",
+      "description" : "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+      "location" : "query"
+    },
+    "oauth_token" : {
+      "type" : "string",
+      "description" : "OAuth 2.0 token for the current user.",
+      "location" : "query"
+    },
+    "prettyPrint" : {
+      "type" : "boolean",
+      "description" : "Returns response with indentations and line breaks.",
+      "default" : "true",
+      "location" : "query"
+    },
+    "quotaUser" : {
+      "type" : "string",
+      "description" : "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+      "location" : "query"
+    },
+    "userIp" : {
+      "type" : "string",
+      "description" : "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+      "location" : "query"
+    }
+  },
+  "auth" : {
+    "oauth2" : {
+      "scopes" : {
+        "https://www.googleapis.com/auth/userinfo.email" : {
+          "description" : "View your email address"
+        }
+      }
+    }
+  },
+  "schemas" : {
+    "ActionResponse" : {
+      "id" : "ActionResponse",
+      "type" : "object",
+      "properties" : {
+        "_id" : {
+          "type" : "string"
+        },
+        "action" : {
+          "type" : "string"
+        },
+        "by" : {
+          "type" : "string"
+        },
+        "modified" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "reply" : {
+          "$ref" : "ReplyResponse"
+        },
+        "value" : {
+          "type" : "string"
+        }
+      }
+    },
+    "AskForm" : {
+      "id" : "AskForm",
+      "type" : "object",
+      "properties" : {
+        "board" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "PlayerCharacterState"
+          }
+        },
+        "gameId" : {
+          "type" : "string"
+        },
+        "question" : {
+          "type" : "string"
+        },
+        "token" : {
+          "type" : "string"
+        }
+      }
+    },
+    "BoardResponse" : {
+      "id" : "BoardResponse",
+      "type" : "object",
+      "properties" : {
+        "characters" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "CharacterResponse"
+          }
+        },
+        "name" : {
+          "type" : "string"
+        }
+      }
+    },
+    "CharacterResponse" : {
+      "id" : "CharacterResponse",
+      "type" : "object",
+      "properties" : {
+        "_id" : {
+          "type" : "string"
+        },
+        "img" : {
+          "type" : "string"
+        },
+        "name" : {
+          "type" : "string"
+        }
+      }
+    },
+    "GameResponse" : {
+      "id" : "GameResponse",
+      "type" : "object",
+      "properties" : {
+        "_id" : {
+          "type" : "string"
+        },
+        "board" : {
+          "$ref" : "BoardResponse"
+        },
+        "ended" : {
+          "type" : "boolean"
+        },
+        "me" : {
+          "$ref" : "PlayerResponse"
+        },
+        "modified" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "opponent" : {
+          "$ref" : "PlayerResponse"
+        },
+        "state" : {
+          "type" : "string"
+        },
+        "turn" : {
+          "type" : "string"
+        },
+        "winner" : {
+          "$ref" : "WinnerResponse"
+        }
+      }
+    },
+    "GameResponseCollection" : {
+      "id" : "GameResponseCollection",
+      "type" : "object",
+      "properties" : {
+        "items" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "GameResponse"
+          }
+        }
+      }
+    },
+    "GuessForm" : {
+      "id" : "GuessForm",
+      "type" : "object",
+      "properties" : {
+        "board" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "PlayerCharacterState"
+          }
+        },
+        "characterId" : {
+          "type" : "string"
+        },
+        "gameId" : {
+          "type" : "string"
+        },
+        "token" : {
+          "type" : "string"
+        }
+      }
+    },
+    "PlayerCharacterState" : {
+      "id" : "PlayerCharacterState",
+      "type" : "object",
+      "properties" : {
+        "_id" : {
+          "type" : "string"
+        },
+        "up" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "PlayerResponse" : {
+      "id" : "PlayerResponse",
+      "type" : "object",
+      "properties" : {
+        "_id" : {
+          "type" : "string"
+        },
+        "actions" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "ActionResponse"
+          }
+        },
+        "board" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "PlayerCharacterState"
+          }
+        },
+        "character" : {
+          "type" : "string"
+        },
+        "username" : {
+          "type" : "string"
+        }
+      }
+    },
+    "ProfileResponse" : {
+      "id" : "ProfileResponse",
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "token" : {
+          "type" : "string"
+        }
+      }
+    },
+    "ReplyForm" : {
+      "id" : "ReplyForm",
+      "type" : "object",
+      "properties" : {
+        "gameId" : {
+          "type" : "string"
+        },
+        "questionId" : {
+          "type" : "string"
+        },
+        "reply" : {
+          "type" : "string"
+        },
+        "token" : {
+          "type" : "string"
+        }
+      }
+    },
+    "ReplyResponse" : {
+      "id" : "ReplyResponse",
+      "type" : "object",
+      "properties" : {
+        "value" : {
+          "type" : "string"
+        }
+      }
+    },
+    "SaveForm" : {
+      "id" : "SaveForm",
+      "type" : "object",
+      "properties" : {
+        "board" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "PlayerCharacterState"
+          }
+        },
+        "gameId" : {
+          "type" : "string"
+        },
+        "token" : {
+          "type" : "string"
+        }
+      }
+    },
+    "WinnerResponse" : {
+      "id" : "WinnerResponse",
+      "type" : "object",
+      "properties" : {
+        "actionid" : {
+          "type" : "string"
+        },
+        "by" : {
+          "type" : "string"
+        }
+      }
+    }
+  },
+  "methods" : {
+    "askQuestion" : {
+      "id" : "gezzoo.askQuestion",
+      "path" : "games/{gameId}/question",
+      "httpMethod" : "POST",
+      "parameterOrder" : [ "gameId" ],
+      "request" : {
+        "$ref" : "AskForm",
+        "parameterName" : "resource"
+      },
+      "response" : {
+        "$ref" : "GameResponse"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    },
+    "createBoard" : {
+      "id" : "gezzoo.createBoard",
+      "path" : "board",
+      "httpMethod" : "POST",
+      "response" : {
+        "$ref" : "BoardResponse"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    },
+    "createProfile" : {
+      "id" : "gezzoo.createProfile",
+      "path" : "create",
+      "httpMethod" : "POST",
+      "response" : {
+        "$ref" : "ProfileResponse"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    },
+    "getGame" : {
+      "id" : "gezzoo.getGame",
+      "path" : "games/{gameId}",
+      "httpMethod" : "GET",
+      "parameters" : {
+        "gameId" : {
+          "type" : "string",
+          "required" : true,
+          "location" : "path"
+        },
+        "token" : {
+          "type" : "string",
+          "required" : true,
+          "location" : "query"
+        }
+      },
+      "parameterOrder" : [ "gameId", "token" ],
+      "response" : {
+        "$ref" : "GameResponse"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    },
+    "getGames" : {
+      "id" : "gezzoo.getGames",
+      "path" : "games",
+      "httpMethod" : "GET",
+      "parameters" : {
+        "token" : {
+          "type" : "string",
+          "required" : true,
+          "location" : "query"
+        }
+      },
+      "parameterOrder" : [ "token" ],
+      "response" : {
+        "$ref" : "GameResponseCollection"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    },
+    "guess" : {
+      "id" : "gezzoo.guess",
+      "path" : "games/{gameId}/guess",
+      "httpMethod" : "POST",
+      "parameterOrder" : [ "gameId" ],
+      "request" : {
+        "$ref" : "GuessForm",
+        "parameterName" : "resource"
+      },
+      "response" : {
+        "$ref" : "GameResponse"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    },
+    "login" : {
+      "id" : "gezzoo.login",
+      "path" : "login",
+      "httpMethod" : "POST",
+      "parameters" : {
+        "token" : {
+          "type" : "string",
+          "required" : true,
+          "location" : "query"
+        }
+      },
+      "parameterOrder" : [ "token" ],
+      "response" : {
+        "$ref" : "ProfileResponse"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    },
+    "newGame" : {
+      "id" : "gezzoo.newGame",
+      "path" : "games",
+      "httpMethod" : "POST",
+      "parameters" : {
+        "token" : {
+          "type" : "string",
+          "required" : true,
+          "location" : "query"
+        }
+      },
+      "parameterOrder" : [ "token" ],
+      "response" : {
+        "$ref" : "GameResponse"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    },
+    "newGameWith" : {
+      "id" : "gezzoo.newGameWith",
+      "path" : "gamesWith",
+      "httpMethod" : "POST",
+      "parameters" : {
+        "opponent" : {
+          "type" : "string",
+          "required" : true,
+          "location" : "query"
+        },
+        "token" : {
+          "type" : "string",
+          "required" : true,
+          "location" : "query"
+        }
+      },
+      "parameterOrder" : [ "opponent", "token" ],
+      "response" : {
+        "$ref" : "GameResponse"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    },
+    "postReply" : {
+      "id" : "gezzoo.postReply",
+      "path" : "games/{gameId}/reply",
+      "httpMethod" : "POST",
+      "parameterOrder" : [ "gameId" ],
+      "request" : {
+        "$ref" : "ReplyForm",
+        "parameterName" : "resource"
+      },
+      "response" : {
+        "$ref" : "GameResponse"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    },
+    "saveBoard" : {
+      "id" : "gezzoo.saveBoard",
+      "path" : "games/{gameId}/board",
+      "httpMethod" : "POST",
+      "parameterOrder" : [ "gameId" ],
+      "request" : {
+        "$ref" : "SaveForm",
+        "parameterName" : "resource"
+      },
+      "response" : {
+        "$ref" : "GameResponse"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    },
+    "setCharacter" : {
+      "id" : "gezzoo.setCharacter",
+      "path" : "games/{gameId}/character",
+      "httpMethod" : "POST",
+      "parameters" : {
+        "character" : {
+          "type" : "string",
+          "required" : true,
+          "location" : "query"
+        },
+        "gameId" : {
+          "type" : "string",
+          "required" : true,
+          "location" : "path"
+        },
+        "token" : {
+          "type" : "string",
+          "required" : true,
+          "location" : "query"
+        }
+      },
+      "parameterOrder" : [ "gameId", "character", "token" ],
+      "response" : {
+        "$ref" : "GameResponse"
+      },
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ]
+    }
+  }
+}
